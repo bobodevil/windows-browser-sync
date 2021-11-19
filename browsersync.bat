@@ -1,4 +1,5 @@
 @echo off 
+setlocal enabledelayedexpansion
 
 ECHO ----------------------
 ECHO Killing Edge Process
@@ -10,23 +11,18 @@ TaskKill /im msedge.exe /f
 
 SET APPLOCALDIR=C:%HOMEPATH%\AppData\Local
 
-
 SET BRAVEUSERDIR=%APPLOCALDIR%\BraveSoftware\Brave-Browser\User Data\Default\
 
 SET EDGEUSERDIR=%APPLOCALDIR%\Microsoft\Edge\User Data\Default\
 
-SET CHROMEBOOKMARKFILES[0]=Bookmarks
-SET CHROMEBOOKMARKFILES[1]=Bookmarks.bak
-
-SET CHROMEFAVFILES[0]=Favicons
-SET CHROMEFAVFILES[1]=Favicons-journal
-
-
-SET CHROMEHISTORYFILES[0]=History
-SET CHROMEHISTORYFILES[1]=History-journal
-
-SET CHROMELDATAFILES[0]=Login Data
-SET CHROMELDATAFILES[1]=Login Data-journal
+SET CHROMEFILES[0]=Bookmarks
+SET CHROMEFILES[1]=Bookmarks.bak
+SET CHROMEFILES[2]=Favicons
+SET CHROMEFILES[3]=Favicons-journal
+SET CHROMEFILES[4]=History
+SET CHROMEFILES[5]=History-journal
+SET CHROMEFILES[6]=Login Data
+SET CHROMEFILES[7]=Login Data-journal
 
 ECHO ----------------------
 ECHO ----------------------
@@ -34,28 +30,19 @@ ECHO ----------------------
 ECHO Copying from Brave to Edge
 ECHO ----------------------
 
-del "%EDGEUSERDIR%%CHROMEBOOKMARKFILES[0]%.backup"
-del "%EDGEUSERDIR%%CHROMEBOOKMARKFILES[1]%.backup"
-rename "%EDGEUSERDIR%%CHROMEBOOKMARKFILES[0]%" "%CHROMEBOOKMARKFILES[0]%.backup"
-rename "%EDGEUSERDIR%%CHROMEBOOKMARKFILES[1]%" "%CHROMEBOOKMARKFILES[1]%.backup"
-copy "%BRAVEUSERDIR%%CHROMEBOOKMARKFILES[0]%" "%EDGEUSERDIR%"
-copy "%BRAVEUSERDIR%%CHROMEBOOKMARKFILES[1]%" "%EDGEUSERDIR%"
 
 
-del "%EDGEUSERDIR%%CHROMEHISTORYFILES[0]%.backup"
-del "%EDGEUSERDIR%%CHROMEHISTORYFILES[1]%.backup"
-rename "%EDGEUSERDIR%%CHROMEHISTORYFILES[0]%" "%CHROMEHISTORYFILES[0]%.backup"
-rename "%EDGEUSERDIR%%CHROMEHISTORYFILES[1]%" "%CHROMEHISTORYFILES[1]%.backup"
-copy "%BRAVEUSERDIR%%CHROMEHISTORYFILES[0]%" "%EDGEUSERDIR%"
-copy "%BRAVEUSERDIR%%CHROMEHISTORYFILES[1]%" "%EDGEUSERDIR%"
+SET FROMBROWSER=%BRAVEUSERDIR%
+SET TOBROWSER=%EDGEUSERDIR%
+
+for /l %%n in (0,1,7) do ( 
+   SET CURRENTFILE=!CHROMEFILES[%%n]!
+   del "%TOBROWSER%!CURRENTFILE!.backup"
+   rename "%TOBROWSER%!CURRENTFILE!" "!CURRENTFILE!.backup"
+   copy "%FROMBROWSER%!CURRENTFILE!" "%TOBROWSER%"
+)
 
 
-del "%EDGEUSERDIR%%CHROMELDATAFILES[0]%.backup"
-del "%EDGEUSERDIR%%CHROMELDATAFILES[1]%.backup"
-rename "%EDGEUSERDIR%%CHROMELDATAFILES[0]%" "%CHROMELDATAFILES[0]%.backup"
-rename "%EDGEUSERDIR%%CHROMELDATAFILES[1]%" "%CHROMELDATAFILES[1]%.backup"
-copy "%BRAVEUSERDIR%%CHROMELDATAFILES[0]%" "%EDGEUSERDIR%"
-copy "%BRAVEUSERDIR%%CHROMELDATAFILES[1]%" "%EDGEUSERDIR%"
 
 ECHO ----------------------
 ECHO ----------------------
@@ -63,3 +50,5 @@ ECHO Restarting Edge
 ECHO ----------------------
 
 start msedge --restore-last-session
+
+
